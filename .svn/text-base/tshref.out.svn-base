@@ -1,0 +1,767 @@
+./sdriver.pl -t trace01.txt -s ./tshref -a "-p" | tee rtest01
+#
+# trace01.txt - Properly terminate on EOF.
+#
+=======================================================================
+./sdriver.pl -t trace01.txt -s ./tsh -a "-p" | tee trace01.out
+#
+# trace01.txt - Properly terminate on EOF.
+#
+--------------------------------
+diff rtest01 trace01.out | cat -
+./sdriver.pl -t trace02.txt -s ./tshref -a "-p" | tee rtest02
+#
+# trace02.txt - Process builtin quit command.
+#
+=======================================================================
+./sdriver.pl -t trace02.txt -s ./tsh -a "-p" | tee trace02.out
+#
+# trace02.txt - Process builtin quit command.
+#
+--------------------------------
+diff rtest02 trace02.out | cat -
+./sdriver.pl -t trace03.txt -s ./tshref -a "-p" | tee rtest03
+#
+# trace03.txt - Run a foreground job.
+#
+tsh> quit
+=======================================================================
+./sdriver.pl -t trace03.txt -s ./tsh -a "-p" | tee trace03.out
+#
+# trace03.txt - Run a foreground job.
+#
+tsh> quit
+--------------------------------
+diff rtest03 trace03.out | cat -
+./sdriver.pl -t trace04.txt -s ./tshref -a "-p" | tee rtest04
+#
+# trace04.txt - Run a background job.
+#
+tsh> ./myspin 1 &
+[1] (9007) ./myspin 1 &
+=======================================================================
+./sdriver.pl -t trace04.txt -s ./tsh -a "-p" | tee trace04.out
+#
+# trace04.txt - Run a background job.
+#
+tsh> ./myspin 1 &
+[1] (9014) ./myspin 1 &
+--------------------------------
+diff rtest04 trace04.out | cat -
+5c5
+< [1] (9007) ./myspin 1 &
+---
+> [1] (9014) ./myspin 1 &
+./sdriver.pl -t trace05.txt -s ./tshref -a "-p" | tee rtest05
+#
+# trace05.txt - Process jobs builtin command.
+#
+tsh> ./myspin 2 &
+[1] (9024) ./myspin 2 &
+tsh> ./myspin 3 &
+[2] (9026) ./myspin 3 &
+tsh> jobs
+[1] (9024) Running ./myspin 2 &
+[2] (9026) Running ./myspin 3 &
+=======================================================================
+./sdriver.pl -t trace05.txt -s ./tsh -a "-p" | tee trace05.out
+#
+# trace05.txt - Process jobs builtin command.
+#
+tsh> ./myspin 2 &
+[1] (9035) ./myspin 2 &
+tsh> ./myspin 3 &
+[2] (9037) ./myspin 3 &
+tsh> jobs
+[1] (9035) Running ./myspin 2 &
+[2] (9037) Running ./myspin 3 &
+--------------------------------
+diff rtest05 trace05.out | cat -
+5c5
+< [1] (9024) ./myspin 2 &
+---
+> [1] (9035) ./myspin 2 &
+7c7
+< [2] (9026) ./myspin 3 &
+---
+> [2] (9037) ./myspin 3 &
+9,10c9,10
+< [1] (9024) Running ./myspin 2 &
+< [2] (9026) Running ./myspin 3 &
+---
+> [1] (9035) Running ./myspin 2 &
+> [2] (9037) Running ./myspin 3 &
+./sdriver.pl -t trace06.txt -s ./tshref -a "-p" | tee rtest06
+#
+# trace06.txt - Forward SIGINT to foreground job.
+#
+tsh> ./myspin 4
+Job [1] (9048) terminated by signal 2
+=======================================================================
+./sdriver.pl -t trace06.txt -s ./tsh -a "-p" | tee trace06.out
+#
+# trace06.txt - Forward SIGINT to foreground job.
+#
+tsh> ./myspin 4
+Job [1] (9055) terminated by signal 2
+--------------------------------
+diff rtest06 trace06.out | cat -
+5c5
+< Job [1] (9048) terminated by signal 2
+---
+> Job [1] (9055) terminated by signal 2
+./sdriver.pl -t trace07.txt -s ./tshref -a "-p" | tee rtest07
+#
+# trace07.txt - Forward SIGINT only to foreground job.
+#
+tsh> ./myspin 4 &
+[1] (9066) ./myspin 4 &
+tsh> ./myspin 5
+Job [2] (9068) terminated by signal 2
+tsh> jobs
+[1] (9066) Running ./myspin 4 &
+=======================================================================
+./sdriver.pl -t trace07.txt -s ./tsh -a "-p" | tee trace07.out
+#
+# trace07.txt - Forward SIGINT only to foreground job.
+#
+tsh> ./myspin 4 &
+[1] (9080) ./myspin 4 &
+tsh> ./myspin 5
+Job [2] (9082) terminated by signal 2
+tsh> jobs
+[1] (9080) Running ./myspin 4 &
+--------------------------------
+diff rtest07 trace07.out | cat -
+5c5
+< [1] (9066) ./myspin 4 &
+---
+> [1] (9080) ./myspin 4 &
+7c7
+< Job [2] (9068) terminated by signal 2
+---
+> Job [2] (9082) terminated by signal 2
+9c9
+< [1] (9066) Running ./myspin 4 &
+---
+> [1] (9080) Running ./myspin 4 &
+./sdriver.pl -t trace08.txt -s ./tshref -a "-p" | tee rtest08
+#
+# trace08.txt - Forward SIGTSTP only to foreground job.
+#
+tsh> ./myspin 4 &
+[1] (9094) ./myspin 4 &
+tsh> ./myspin 5
+Job [2] (9096) stopped by signal 20
+tsh> jobs
+[1] (9094) Running ./myspin 4 &
+[2] (9096) Stopped ./myspin 5 
+=======================================================================
+./sdriver.pl -t trace08.txt -s ./tsh -a "-p" | tee trace08.out
+#
+# trace08.txt - Forward SIGTSTP only to foreground job.
+#
+tsh> ./myspin 4 &
+[1] (9104) ./myspin 4 &
+tsh> ./myspin 5
+Job [2] (9106) stopped by signal 20
+tsh> jobs
+[1] (9104) Running ./myspin 4 &
+[2] (9106) Stopped ./myspin 5 
+--------------------------------
+diff rtest08 trace08.out | cat -
+5c5
+< [1] (9094) ./myspin 4 &
+---
+> [1] (9104) ./myspin 4 &
+7c7
+< Job [2] (9096) stopped by signal 20
+---
+> Job [2] (9106) stopped by signal 20
+9,10c9,10
+< [1] (9094) Running ./myspin 4 &
+< [2] (9096) Stopped ./myspin 5 
+---
+> [1] (9104) Running ./myspin 4 &
+> [2] (9106) Stopped ./myspin 5 
+./sdriver.pl -t trace09.txt -s ./tshref -a "-p" | tee rtest09
+#
+# trace09.txt - Process bg builtin command
+#
+tsh> ./myspin 4 &
+[1] (9118) ./myspin 4 &
+tsh> ./myspin 5
+Job [2] (9120) stopped by signal 20
+tsh> jobs
+[1] (9118) Running ./myspin 4 &
+[2] (9120) Stopped ./myspin 5 
+tsh> bg %2
+[2] (9120) ./myspin 5 
+tsh> jobs
+[1] (9118) Running ./myspin 4 &
+[2] (9120) Running ./myspin 5 
+=======================================================================
+./sdriver.pl -t trace09.txt -s ./tsh -a "-p" | tee trace09.out
+#
+# trace09.txt - Process bg builtin command
+#
+tsh> ./myspin 4 &
+[1] (9131) ./myspin 4 &
+tsh> ./myspin 5
+Job [2] (9133) stopped by signal 20
+tsh> jobs
+[1] (9131) Running ./myspin 4 &
+[2] (9133) Stopped ./myspin 5 
+tsh> bg %2
+[2] (9133) ./myspin 5 
+tsh> jobs
+[1] (9131) Running ./myspin 4 &
+[2] (9133) Running ./myspin 5 
+--------------------------------
+diff rtest09 trace09.out | cat -
+5c5
+< [1] (9118) ./myspin 4 &
+---
+> [1] (9131) ./myspin 4 &
+7c7
+< Job [2] (9120) stopped by signal 20
+---
+> Job [2] (9133) stopped by signal 20
+9,10c9,10
+< [1] (9118) Running ./myspin 4 &
+< [2] (9120) Stopped ./myspin 5 
+---
+> [1] (9131) Running ./myspin 4 &
+> [2] (9133) Stopped ./myspin 5 
+12c12
+< [2] (9120) ./myspin 5 
+---
+> [2] (9133) ./myspin 5 
+14,15c14,15
+< [1] (9118) Running ./myspin 4 &
+< [2] (9120) Running ./myspin 5 
+---
+> [1] (9131) Running ./myspin 4 &
+> [2] (9133) Running ./myspin 5 
+./sdriver.pl -t trace10.txt -s ./tshref -a "-p" | tee rtest10
+#
+# trace10.txt - Process fg builtin command. 
+#
+tsh> ./myspin 4 &
+[1] (9147) ./myspin 4 &
+tsh> fg %1
+Job [1] (9147) stopped by signal 20
+tsh> jobs
+[1] (9147) Stopped ./myspin 4 &
+tsh> fg %1
+tsh> jobs
+=======================================================================
+./sdriver.pl -t trace10.txt -s ./tsh -a "-p" | tee trace10.out
+#
+# trace10.txt - Process fg builtin command. 
+#
+tsh> ./myspin 4 &
+[1] (9159) ./myspin 4 &
+tsh> fg %1
+Job [1] (9159) stopped by signal 20
+tsh> jobs
+[1] (9159) Stopped ./myspin 4 &
+tsh> fg %1
+tsh> jobs
+--------------------------------
+diff rtest10 trace10.out | cat -
+5c5
+< [1] (9147) ./myspin 4 &
+---
+> [1] (9159) ./myspin 4 &
+7c7
+< Job [1] (9147) stopped by signal 20
+---
+> Job [1] (9159) stopped by signal 20
+9c9
+< [1] (9147) Stopped ./myspin 4 &
+---
+> [1] (9159) Stopped ./myspin 4 &
+./sdriver.pl -t trace11.txt -s ./tshref -a "-p" | tee rtest11
+#
+# trace11.txt - Forward SIGINT to every process in foreground process group
+#
+tsh> ./mysplit 4
+Job [1] (9174) terminated by signal 2
+tsh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1221 tty4     Ss+    0:00 /sbin/getty -8 38400 tty4
+ 1226 tty5     Ss+    0:00 /sbin/getty -8 38400 tty5
+ 1237 tty2     Ss+    0:00 /sbin/getty -8 38400 tty2
+ 1239 tty3     Ss+    0:00 /sbin/getty -8 38400 tty3
+ 1243 tty6     Ss+    0:00 /sbin/getty -8 38400 tty6
+ 1279 tty7     Ss+    0:07 /usr/bin/X :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch -background none
+ 2967 tty1     Ss+    0:00 /sbin/getty -8 38400 tty1
+ 4945 pts/0    Ss     0:00 -bash
+ 8960 pts/0    S+     0:00 make alltest
+ 9169 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace11.txt -s ./tshref -a "-p" | tee rtest11
+ 9170 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace11.txt -s ./tshref -a -p
+ 9171 pts/0    S+     0:00 tee rtest11
+ 9172 pts/0    S+     0:00 ./tshref -p
+ 9178 pts/0    R      0:00 /bin/ps a
+=======================================================================
+./sdriver.pl -t trace11.txt -s ./tsh -a "-p" | tee trace11.out
+#
+# trace11.txt - Forward SIGINT to every process in foreground process group
+#
+tsh> ./mysplit 4
+Job [1] (9185) terminated by signal 2
+tsh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1221 tty4     Ss+    0:00 /sbin/getty -8 38400 tty4
+ 1226 tty5     Ss+    0:00 /sbin/getty -8 38400 tty5
+ 1237 tty2     Ss+    0:00 /sbin/getty -8 38400 tty2
+ 1239 tty3     Ss+    0:00 /sbin/getty -8 38400 tty3
+ 1243 tty6     Ss+    0:00 /sbin/getty -8 38400 tty6
+ 1279 tty7     Ss+    0:07 /usr/bin/X :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch -background none
+ 2967 tty1     Ss+    0:00 /sbin/getty -8 38400 tty1
+ 4945 pts/0    Ss     0:00 -bash
+ 8960 pts/0    S+     0:00 make alltest
+ 9180 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace11.txt -s ./tsh -a "-p" | tee trace11.out
+ 9181 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace11.txt -s ./tsh -a -p
+ 9182 pts/0    S+     0:00 tee trace11.out
+ 9183 pts/0    S+     0:00 ./tsh -p
+ 9188 pts/0    R      0:00 /bin/ps a
+--------------------------------
+diff rtest11 trace11.out | cat -
+5c5
+< Job [1] (9174) terminated by signal 2
+---
+> Job [1] (9185) terminated by signal 2
+17,21c17,21
+<  9169 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace11.txt -s ./tshref -a "-p" | tee rtest11
+<  9170 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace11.txt -s ./tshref -a -p
+<  9171 pts/0    S+     0:00 tee rtest11
+<  9172 pts/0    S+     0:00 ./tshref -p
+<  9178 pts/0    R      0:00 /bin/ps a
+---
+>  9180 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace11.txt -s ./tsh -a "-p" | tee trace11.out
+>  9181 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace11.txt -s ./tsh -a -p
+>  9182 pts/0    S+     0:00 tee trace11.out
+>  9183 pts/0    S+     0:00 ./tsh -p
+>  9188 pts/0    R      0:00 /bin/ps a
+./sdriver.pl -t trace12.txt -s ./tshref -a "-p" | tee rtest12
+#
+# trace12.txt - Forward SIGTSTP to every process in foreground process group
+#
+tsh> ./mysplit 4
+Job [1] (9198) stopped by signal 20
+tsh> jobs
+[1] (9198) Stopped ./mysplit 4 
+tsh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1221 tty4     Ss+    0:00 /sbin/getty -8 38400 tty4
+ 1226 tty5     Ss+    0:00 /sbin/getty -8 38400 tty5
+ 1237 tty2     Ss+    0:00 /sbin/getty -8 38400 tty2
+ 1239 tty3     Ss+    0:00 /sbin/getty -8 38400 tty3
+ 1243 tty6     Ss+    0:00 /sbin/getty -8 38400 tty6
+ 1279 tty7     Ss+    0:07 /usr/bin/X :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch -background none
+ 2967 tty1     Ss+    0:00 /sbin/getty -8 38400 tty1
+ 4945 pts/0    Ss     0:00 -bash
+ 8960 pts/0    S+     0:00 make alltest
+ 9193 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace12.txt -s ./tshref -a "-p" | tee rtest12
+ 9194 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace12.txt -s ./tshref -a -p
+ 9195 pts/0    S+     0:00 tee rtest12
+ 9196 pts/0    S+     0:00 ./tshref -p
+ 9198 pts/0    T      0:00 ./mysplit 4
+ 9199 pts/0    T      0:00 ./mysplit 4
+ 9202 pts/0    R      0:00 /bin/ps a
+=======================================================================
+./sdriver.pl -t trace12.txt -s ./tsh -a "-p" | tee trace12.out
+#
+# trace12.txt - Forward SIGTSTP to every process in foreground process group
+#
+tsh> ./mysplit 4
+Job [1] (9209) stopped by signal 20
+tsh> jobs
+[1] (9209) Stopped ./mysplit 4 
+tsh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1221 tty4     Ss+    0:00 /sbin/getty -8 38400 tty4
+ 1226 tty5     Ss+    0:00 /sbin/getty -8 38400 tty5
+ 1237 tty2     Ss+    0:00 /sbin/getty -8 38400 tty2
+ 1239 tty3     Ss+    0:00 /sbin/getty -8 38400 tty3
+ 1243 tty6     Ss+    0:00 /sbin/getty -8 38400 tty6
+ 1279 tty7     Ss+    0:07 /usr/bin/X :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch -background none
+ 2967 tty1     Ss+    0:00 /sbin/getty -8 38400 tty1
+ 4945 pts/0    Ss     0:00 -bash
+ 8960 pts/0    S+     0:00 make alltest
+ 9204 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace12.txt -s ./tsh -a "-p" | tee trace12.out
+ 9205 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace12.txt -s ./tsh -a -p
+ 9206 pts/0    S+     0:00 tee trace12.out
+ 9207 pts/0    S+     0:00 ./tsh -p
+ 9209 pts/0    T      0:00 ./mysplit 4
+ 9210 pts/0    T      0:00 ./mysplit 4
+ 9213 pts/0    R      0:00 /bin/ps a
+--------------------------------
+diff rtest12 trace12.out | cat -
+5c5
+< Job [1] (9198) stopped by signal 20
+---
+> Job [1] (9209) stopped by signal 20
+7c7
+< [1] (9198) Stopped ./mysplit 4 
+---
+> [1] (9209) Stopped ./mysplit 4 
+19,25c19,25
+<  9193 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace12.txt -s ./tshref -a "-p" | tee rtest12
+<  9194 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace12.txt -s ./tshref -a -p
+<  9195 pts/0    S+     0:00 tee rtest12
+<  9196 pts/0    S+     0:00 ./tshref -p
+<  9198 pts/0    T      0:00 ./mysplit 4
+<  9199 pts/0    T      0:00 ./mysplit 4
+<  9202 pts/0    R      0:00 /bin/ps a
+---
+>  9204 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace12.txt -s ./tsh -a "-p" | tee trace12.out
+>  9205 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace12.txt -s ./tsh -a -p
+>  9206 pts/0    S+     0:00 tee trace12.out
+>  9207 pts/0    S+     0:00 ./tsh -p
+>  9209 pts/0    T      0:00 ./mysplit 4
+>  9210 pts/0    T      0:00 ./mysplit 4
+>  9213 pts/0    R      0:00 /bin/ps a
+./sdriver.pl -t trace13.txt -s ./tshref -a "-p" | tee rtest13
+#
+# trace13.txt - Restart every stopped process in process group
+#
+tsh> ./mysplit 4
+Job [1] (9223) stopped by signal 20
+tsh> jobs
+[1] (9223) Stopped ./mysplit 4 
+tsh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1221 tty4     Ss+    0:00 /sbin/getty -8 38400 tty4
+ 1226 tty5     Ss+    0:00 /sbin/getty -8 38400 tty5
+ 1237 tty2     Ss+    0:00 /sbin/getty -8 38400 tty2
+ 1239 tty3     Ss+    0:00 /sbin/getty -8 38400 tty3
+ 1243 tty6     Ss+    0:00 /sbin/getty -8 38400 tty6
+ 1279 tty7     Ss+    0:07 /usr/bin/X :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch -background none
+ 2967 tty1     Ss+    0:00 /sbin/getty -8 38400 tty1
+ 4945 pts/0    Ss     0:00 -bash
+ 8960 pts/0    S+     0:00 make alltest
+ 9218 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace13.txt -s ./tshref -a "-p" | tee rtest13
+ 9219 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -s ./tshref -a -p
+ 9220 pts/0    S+     0:00 tee rtest13
+ 9221 pts/0    S+     0:00 ./tshref -p
+ 9223 pts/0    T      0:00 ./mysplit 4
+ 9224 pts/0    T      0:00 ./mysplit 4
+ 9228 pts/0    R      0:00 /bin/ps a
+tsh> fg %1
+tsh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1221 tty4     Ss+    0:00 /sbin/getty -8 38400 tty4
+ 1226 tty5     Ss+    0:00 /sbin/getty -8 38400 tty5
+ 1237 tty2     Ss+    0:00 /sbin/getty -8 38400 tty2
+ 1239 tty3     Ss+    0:00 /sbin/getty -8 38400 tty3
+ 1243 tty6     Ss+    0:00 /sbin/getty -8 38400 tty6
+ 1279 tty7     Ss+    0:07 /usr/bin/X :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch -background none
+ 2967 tty1     Ss+    0:00 /sbin/getty -8 38400 tty1
+ 4945 pts/0    Ss     0:00 -bash
+ 8960 pts/0    S+     0:00 make alltest
+ 9218 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace13.txt -s ./tshref -a "-p" | tee rtest13
+ 9219 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -s ./tshref -a -p
+ 9220 pts/0    S+     0:00 tee rtest13
+ 9221 pts/0    S+     0:00 ./tshref -p
+ 9232 pts/0    R      0:00 /bin/ps a
+=======================================================================
+./sdriver.pl -t trace13.txt -s ./tsh -a "-p" | tee trace13.out
+#
+# trace13.txt - Restart every stopped process in process group
+#
+tsh> ./mysplit 4
+Job [1] (9239) stopped by signal 20
+tsh> jobs
+[1] (9239) Stopped ./mysplit 4 
+tsh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1221 tty4     Ss+    0:00 /sbin/getty -8 38400 tty4
+ 1226 tty5     Ss+    0:00 /sbin/getty -8 38400 tty5
+ 1237 tty2     Ss+    0:00 /sbin/getty -8 38400 tty2
+ 1239 tty3     Ss+    0:00 /sbin/getty -8 38400 tty3
+ 1243 tty6     Ss+    0:00 /sbin/getty -8 38400 tty6
+ 1279 tty7     Ss+    0:07 /usr/bin/X :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch -background none
+ 2967 tty1     Ss+    0:00 /sbin/getty -8 38400 tty1
+ 4945 pts/0    Ss     0:00 -bash
+ 8960 pts/0    S+     0:00 make alltest
+ 9234 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace13.txt -s ./tsh -a "-p" | tee trace13.out
+ 9235 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -s ./tsh -a -p
+ 9236 pts/0    S+     0:00 tee trace13.out
+ 9237 pts/0    S+     0:00 ./tsh -p
+ 9239 pts/0    T      0:00 ./mysplit 4
+ 9240 pts/0    T      0:00 ./mysplit 4
+ 9243 pts/0    R      0:00 /bin/ps a
+tsh> fg %1
+tsh> /bin/ps a
+  PID TTY      STAT   TIME COMMAND
+ 1221 tty4     Ss+    0:00 /sbin/getty -8 38400 tty4
+ 1226 tty5     Ss+    0:00 /sbin/getty -8 38400 tty5
+ 1237 tty2     Ss+    0:00 /sbin/getty -8 38400 tty2
+ 1239 tty3     Ss+    0:00 /sbin/getty -8 38400 tty3
+ 1243 tty6     Ss+    0:00 /sbin/getty -8 38400 tty6
+ 1279 tty7     Ss+    0:07 /usr/bin/X :0 -auth /var/run/lightdm/root/:0 -nolisten tcp vt7 -novtswitch -background none
+ 2967 tty1     Ss+    0:00 /sbin/getty -8 38400 tty1
+ 4945 pts/0    Ss     0:00 -bash
+ 8960 pts/0    S+     0:00 make alltest
+ 9234 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace13.txt -s ./tsh -a "-p" | tee trace13.out
+ 9235 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -s ./tsh -a -p
+ 9236 pts/0    S+     0:00 tee trace13.out
+ 9237 pts/0    S+     0:00 ./tsh -p
+ 9246 pts/0    R      0:00 /bin/ps a
+--------------------------------
+diff rtest13 trace13.out | cat -
+5c5
+< Job [1] (9223) stopped by signal 20
+---
+> Job [1] (9239) stopped by signal 20
+7c7
+< [1] (9223) Stopped ./mysplit 4 
+---
+> [1] (9239) Stopped ./mysplit 4 
+19,25c19,25
+<  9218 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace13.txt -s ./tshref -a "-p" | tee rtest13
+<  9219 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -s ./tshref -a -p
+<  9220 pts/0    S+     0:00 tee rtest13
+<  9221 pts/0    S+     0:00 ./tshref -p
+<  9223 pts/0    T      0:00 ./mysplit 4
+<  9224 pts/0    T      0:00 ./mysplit 4
+<  9228 pts/0    R      0:00 /bin/ps a
+---
+>  9234 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace13.txt -s ./tsh -a "-p" | tee trace13.out
+>  9235 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -s ./tsh -a -p
+>  9236 pts/0    S+     0:00 tee trace13.out
+>  9237 pts/0    S+     0:00 ./tsh -p
+>  9239 pts/0    T      0:00 ./mysplit 4
+>  9240 pts/0    T      0:00 ./mysplit 4
+>  9243 pts/0    R      0:00 /bin/ps a
+38,42c38,42
+<  9218 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace13.txt -s ./tshref -a "-p" | tee rtest13
+<  9219 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -s ./tshref -a -p
+<  9220 pts/0    S+     0:00 tee rtest13
+<  9221 pts/0    S+     0:00 ./tshref -p
+<  9232 pts/0    R      0:00 /bin/ps a
+---
+>  9234 pts/0    S+     0:00 /bin/sh -c ./sdriver.pl -t trace13.txt -s ./tsh -a "-p" | tee trace13.out
+>  9235 pts/0    S+     0:00 /usr/bin/perl ./sdriver.pl -t trace13.txt -s ./tsh -a -p
+>  9236 pts/0    S+     0:00 tee trace13.out
+>  9237 pts/0    S+     0:00 ./tsh -p
+>  9246 pts/0    R      0:00 /bin/ps a
+./sdriver.pl -t trace14.txt -s ./tshref -a "-p" | tee rtest14
+#
+# trace14.txt - Simple error handling
+#
+tsh> ./bogus
+./bogus: Command not found
+tsh> ./myspin 4 &
+[1] (9258) ./myspin 4 &
+tsh> fg
+fg command requires PID or %jobid argument
+tsh> bg
+bg command requires PID or %jobid argument
+tsh> fg a
+fg: argument must be a PID or %jobid
+tsh> bg a
+bg: argument must be a PID or %jobid
+tsh> fg 9999999
+(9999999): No such process
+tsh> bg 9999999
+(9999999): No such process
+tsh> fg %2
+%2: No such job
+tsh> fg %1
+Job [1] (9258) stopped by signal 20
+tsh> bg %2
+%2: No such job
+tsh> bg %1
+[1] (9258) ./myspin 4 &
+tsh> jobs
+[1] (9258) Running ./myspin 4 &
+=======================================================================
+./sdriver.pl -t trace14.txt -s ./tsh -a "-p" | tee trace14.out
+#
+# trace14.txt - Simple error handling
+#
+tsh> ./bogus
+./bogus: Command not found
+tsh> ./myspin 4 &
+[1] (9279) ./myspin 4 &
+tsh> fg
+fg command requires PID or %jobid argument
+tsh> bg
+bg command requires PID or %jobid argument
+tsh> fg a
+fg: argument must be a PID or %jobid
+tsh> bg a
+bg: argument must be a PID or %jobid
+tsh> fg 9999999
+(9999999): No such process
+tsh> bg 9999999
+(9999999): No such process
+tsh> fg %2
+%2: No such job
+tsh> fg %1
+Job [1] (9279) stopped by signal 20
+tsh> bg %2
+%2: No such job
+tsh> bg %1
+[1] (9279) ./myspin 4 &
+tsh> jobs
+[1] (9279) Running ./myspin 4 &
+--------------------------------
+diff rtest14 trace14.out | cat -
+7c7
+< [1] (9258) ./myspin 4 &
+---
+> [1] (9279) ./myspin 4 &
+23c23
+< Job [1] (9258) stopped by signal 20
+---
+> Job [1] (9279) stopped by signal 20
+27c27
+< [1] (9258) ./myspin 4 &
+---
+> [1] (9279) ./myspin 4 &
+29c29
+< [1] (9258) Running ./myspin 4 &
+---
+> [1] (9279) Running ./myspin 4 &
+./sdriver.pl -t trace15.txt -s ./tshref -a "-p" | tee rtest15
+#
+# trace15.txt - Putting it all together
+#
+tsh> ./bogus
+./bogus: Command not found
+tsh> ./myspin 10
+Job [1] (9302) terminated by signal 2
+tsh> ./myspin 3 &
+[1] (9305) ./myspin 3 &
+tsh> ./myspin 4 &
+[2] (9307) ./myspin 4 &
+tsh> jobs
+[1] (9305) Running ./myspin 3 &
+[2] (9307) Running ./myspin 4 &
+tsh> fg %1
+Job [1] (9305) stopped by signal 20
+tsh> jobs
+[1] (9305) Stopped ./myspin 3 &
+[2] (9307) Running ./myspin 4 &
+tsh> bg %3
+%3: No such job
+tsh> bg %1
+[1] (9305) ./myspin 3 &
+tsh> jobs
+[1] (9305) Running ./myspin 3 &
+[2] (9307) Running ./myspin 4 &
+tsh> fg %1
+tsh> quit
+=======================================================================
+./sdriver.pl -t trace15.txt -s ./tsh -a "-p" | tee trace15.out
+#
+# trace15.txt - Putting it all together
+#
+tsh> ./bogus
+./bogus: Command not found
+tsh> ./myspin 10
+Job [1] (9328) terminated by signal 2
+tsh> ./myspin 3 &
+[1] (9331) ./myspin 3 &
+tsh> ./myspin 4 &
+[2] (9333) ./myspin 4 &
+tsh> jobs
+[1] (9331) Running ./myspin 3 &
+[2] (9333) Running ./myspin 4 &
+tsh> fg %1
+Job [1] (9331) stopped by signal 20
+tsh> jobs
+[1] (9331) Stopped ./myspin 3 &
+[2] (9333) Running ./myspin 4 &
+tsh> bg %3
+%3: No such job
+tsh> bg %1
+[1] (9331) ./myspin 3 &
+tsh> jobs
+[1] (9331) Running ./myspin 3 &
+[2] (9333) Running ./myspin 4 &
+tsh> fg %1
+tsh> quit
+--------------------------------
+diff rtest15 trace15.out | cat -
+7c7
+< Job [1] (9302) terminated by signal 2
+---
+> Job [1] (9328) terminated by signal 2
+9c9
+< [1] (9305) ./myspin 3 &
+---
+> [1] (9331) ./myspin 3 &
+11c11
+< [2] (9307) ./myspin 4 &
+---
+> [2] (9333) ./myspin 4 &
+13,14c13,14
+< [1] (9305) Running ./myspin 3 &
+< [2] (9307) Running ./myspin 4 &
+---
+> [1] (9331) Running ./myspin 3 &
+> [2] (9333) Running ./myspin 4 &
+16c16
+< Job [1] (9305) stopped by signal 20
+---
+> Job [1] (9331) stopped by signal 20
+18,19c18,19
+< [1] (9305) Stopped ./myspin 3 &
+< [2] (9307) Running ./myspin 4 &
+---
+> [1] (9331) Stopped ./myspin 3 &
+> [2] (9333) Running ./myspin 4 &
+23c23
+< [1] (9305) ./myspin 3 &
+---
+> [1] (9331) ./myspin 3 &
+25,26c25,26
+< [1] (9305) Running ./myspin 3 &
+< [2] (9307) Running ./myspin 4 &
+---
+> [1] (9331) Running ./myspin 3 &
+> [2] (9333) Running ./myspin 4 &
+./sdriver.pl -t trace16.txt -s ./tshref -a "-p" | tee rtest16
+#
+# trace16.txt - Tests whether the shell can handle SIGTSTP and SIGINT
+#     signals that come from other processes instead of the terminal.
+#
+tsh> ./mystop 2
+Job [1] (9351) stopped by signal 20
+tsh> jobs
+[1] (9351) Stopped ./mystop 2
+tsh> ./myint 2
+Job [2] (9354) terminated by signal 2
+=======================================================================
+./sdriver.pl -t trace16.txt -s ./tsh -a "-p" | tee trace16.out
+#
+# trace16.txt - Tests whether the shell can handle SIGTSTP and SIGINT
+#     signals that come from other processes instead of the terminal.
+#
+tsh> ./mystop 2
+Job [1] (9362) stopped by signal 20
+tsh> jobs
+[1] (9362) Stopped ./mystop 2
+tsh> ./myint 2
+Job [2] (9366) terminated by signal 2
+--------------------------------
+diff rtest16 trace16.out | cat -
+6c6
+< Job [1] (9351) stopped by signal 20
+---
+> Job [1] (9362) stopped by signal 20
+8c8
+< [1] (9351) Stopped ./mystop 2
+---
+> [1] (9362) Stopped ./mystop 2
+10c10
+< Job [2] (9354) terminated by signal 2
+---
+> Job [2] (9366) terminated by signal 2
+rm rtest14 rtest07 rtest08 rtest09 rtest01 rtest10 rtest06 rtest16 rtest02 rtest11 rtest12 rtest03 rtest13 rtest05 rtest15 rtest04

@@ -298,13 +298,13 @@ void sigchld_handler(int sig)
       printf("die, process %d signed: signal %d\n",pid2jid(pid),SIGINT);
       deletejob(jobs,pid);
     }
-    else if (WIEXITED(stat)) {
+    else if (WIFEXITED(stat)) {
       deletejob(jobs,pid);
     }
     else if (WIFSTOPPED(stat)) {
       child = getjobjid(jobs, pid2jid(pid));
       child->state = ST;
-      printf("the children are dying, espially %d from signal %d\n",pid2jid(pid),SIGTSTP); 
+      printf("the child %d killed  from signal %d\n",pid2jid(pid),SIGTSTP); 
     }
     else {
       printf("oh fuck, we didn't terminate a child\n");
@@ -320,7 +320,9 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig)
 {
-  kill(-(fgpid(jobs),SIGINT);
+  pid_t p;
+  p = fgpid(jobs); 
+  kill(-p,SIGINT);
   return;
 }
 
@@ -331,7 +333,9 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig)
 {
-  kill(-(fgpid(jobs),SIGSTP);
+  pid_t p;
+  p = fgpid(jobs);
+  kill(-p,SIGTSTP);
   return;
 }
 

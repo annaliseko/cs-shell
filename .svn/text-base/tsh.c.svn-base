@@ -57,15 +57,19 @@ int verbose = 0;            /* if true, print additional output */
 int nextjid = 1;            /* next job ID to allocate */
 char sbuf[MAXLINE];         /* for composing sprintf messages */
 
-struct job_t {              /* The job struct */
+typedef struct job_t {              /* The job struct */
     pid_t pid;              /* job PID */
     int jid;                /* job ID [1, 2, ...] */
     int state;              /* UNDEF, BG, FG, or ST */
     char cmdline[MAXLINE];  /* command line */
-};
+} job_t;
 struct job_t jobs[MAXJOBS]; /* The job list */
 /* End global variables */
 
+/* Reference Materials: 
+   http://pastebin.com/DQyWJBWE
+   Others throughout file
+*/
 
 /* Function prototypes */
 
@@ -180,7 +184,7 @@ int main(int argc, char **argv)
 */
 void eval(char *cmdline)
 {
-    return;
+
 }
 
 /*
@@ -246,7 +250,9 @@ int parseline(const char *cmdline, char **argv)
  */
 int builtin_cmd(char **argv)
 {
-    return 0;     /* not a builtin command */
+  
+  
+  return 0;     /* not a builtin command */
 }
 
 /*
@@ -276,9 +282,35 @@ void waitfg(pid_t pid)
  *     available zombie children, but doesn't wait for any other
  *     currently running children to terminate.
  */
+
+// stuff referenced: http://delorie.com/gnu/docs/glibc/libc_569.html
+
+// WNOHANG, WUNTRACED, WIFSIGNALED, WIFEXITED and WIFSTOPPED
+// all come from waitpid
 void sigchld_handler(int sig)
 {
-    return;
+  int stat; 
+  pid_t pid;
+  job_t* child;
+
+  while((pid = waitpid(-1, &stat, WNOHANG|WUNTRACED)) > 0) {
+    if (WIFSIGNALED(stat)) {
+      printf("die, process %d signed: signal %d\n",pid2jid(pid),SIGINT);
+      deletejob(jobs,pid);
+    }
+    else if (WIFEXITED(stat)) {
+      deletejob(jobs,pid);
+    }
+    else if (WIFSTOPPED(stat)) {
+      child = getjobjid(jobs, pid2jid(pid));
+      child->state = ST;
+      printf("the child %d killed  from signal %d\n",pid2jid(pid),SIGTSTP); 
+    }
+    else {
+      printf("oh fuck, we didn't terminate a child\n");
+    }
+  }
+  return; //okay, we caught the signals
 }
 
 /*
@@ -288,7 +320,10 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig)
 {
-    return;
+  pid_t p;
+  p = fgpid(jobs); 
+  kill(-p,SIGINT);
+  return;
 }
 
 /*
@@ -298,7 +333,10 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig)
 {
-    return;
+  pid_t p;
+  p = fgpid(jobs);
+  kill(-p,SIGTSTP);
+  return;
 }
 
 /*********************

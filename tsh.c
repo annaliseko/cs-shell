@@ -7,8 +7,8 @@
  * IF YOU ARE WORKING AS A PAIR, please identify yourselves
  * with your "CNetID: Name", by editing the following two lines,
  * filling your CNetIDs and Names:
- PP0="jhhadams: Jane H. H. Addams"
- PP1="nolittleplans: Daniel H. Burnham"
+ PP0="howens: Hunter Owens"
+ PP1="hcourt: Hazel Court"
  * This is not a C declaration, and you should not change anything
  * outside the quotation marks.
  * We will be grading the work handed in by the FIRST ("PP0") person
@@ -187,13 +187,14 @@ void eval(char *cmdline)
   char** argv;
   int is_bg;
 
-  argv = (char **) calloc (10, (256*sizeof(char)));
+  argv = (char **) calloc (MAXARGS, (256*sizeof(char)));
   is_bg = parseline (argv);
   if (builtin_cmd(argv) == 0){
     /* job is not built in */
     pid_t pid = fork();
     if (pid == 0){
-      printf("child running\n");
+      printf("child running %i \n", is_bg);
+      
     }
     else{
       printf("parent running\n");

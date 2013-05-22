@@ -184,7 +184,22 @@ int main(int argc, char **argv)
 */
 void eval(char *cmdline)
 {
+  char** argv;
+  int is_bg;
 
+  argv = (char **) calloc (10, (256*sizeof(char)));
+  is_bg = parseline (argv);
+  if (builtin_cmd(argv) == 0){
+    /* job is not built in */
+    pid_t pid = fork();
+    if (pid == 0){
+      printf("child running\n");
+    }
+    else{
+      printf("parent running\n");
+    }
+  }
+  return;
 }
 
 /*

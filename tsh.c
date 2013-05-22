@@ -250,9 +250,25 @@ int parseline(const char *cmdline, char **argv)
  */
 int builtin_cmd(char **argv)
 {
-  
-  
-  return 0;     /* not a builtin command */
+  printf("argv[0] = %s\n",argv[0]);
+  if (strcmp(argv[0],"quit") == 0) {
+    exit(1);
+  }
+  else if (strcmp(argv[0],"jobs") == 0) {
+    printf("do some fucking jobs\n");
+    return 1;
+  }
+  else if (strcmp(argv[0],"bg") == 0) {
+    printf("this is in the background\n");
+    return 1;
+  }
+  else if (strcmp(argv[0],"fg") == 0) {
+    printf("this is in the foreground\n");
+    return 1; 
+  }
+  else {
+    return 0;     /* not a builtin command */
+  }
 }
 
 /*

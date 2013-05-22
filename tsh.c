@@ -191,13 +191,31 @@ void eval(char *cmdline)
   is_bg = parseline (cmdline,argv);
   if (builtin_cmd(argv) == 0){
     /* job is not built in */
-    pid_t pid = fork();
-    if (pid == 0){
-      printf("child running %i \n", is_bg);
-      
+    pid_t child;
+    sigset_t mask;
+    child = fork();
+    if (is_bg){
+      /* do job in background */
     }
     else{
-      printf("parent running\n");
+      signal (SIGCHLD, sigchld_handler);
+      sigemptyset (&mask);
+      sigaddset(&mask, SIGCHLD);
+      sigprocmask (SIG_BLOCK, &mask, NULL);
+    }
+    if (pid == 0){
+      printf("child running %i \n", is_bg);
+
+      if (!is_bg){
+	sigprocmask(SIG_UNBLOCK, &mask, NULL);
+      }
+
+      /* do job stuff */
+
+      exit(0);
+    }
+    if (!is_bg){
+      sigprocmask(SIG_UNBLOCK, &mask, NULL);
     }
   }
   return;

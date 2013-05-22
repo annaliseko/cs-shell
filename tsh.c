@@ -188,7 +188,7 @@ void eval(char *cmdline)
   int is_bg;
 
   argv = (char **) calloc (MAXARGS, (256*sizeof(char)));
-  is_bg = parseline (argv);
+  is_bg = parseline (cmdline,argv);
   if (builtin_cmd(argv) == 0){
     /* job is not built in */
     pid_t pid = fork();

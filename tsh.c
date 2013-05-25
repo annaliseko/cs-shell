@@ -205,9 +205,11 @@ void eval(char *cmdline)
     if (pid != 0){
       if (!is_bg){
 	addjob(jobs, pid, FG, cmdline);
+	waitfg(pid);
       }
       else{
 	addjob(jobs, pid, BG, cmdline);
+	printf("[%d] (%d) %s", pid2jid(pid), pid, cmdline);
       }
     }
     /* child behavior - run job in child context */

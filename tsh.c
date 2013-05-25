@@ -296,14 +296,14 @@ int parseline(const char *cmdline, char **argv)
 int builtin_cmd(char **argv)
 {
   if (strcmp(argv[0],"quit") == 0) {
-    exit(1);
+    exit(1); // exit without complaint
   }
   else if (strcmp(argv[0],"jobs") == 0) {
-    
+    listjobs(jobs);
     return 1;
   }
   else if (strcmp(argv[0],"bg") == 0) {
-    do_bgfb(argv);
+    do_bgfg(argv);
     return 1;
   }
   else if (strcmp(argv[0],"fg") == 0) {
@@ -320,7 +320,40 @@ int builtin_cmd(char **argv)
  */
 void do_bgfg(char **argv)
 {
+  char* arg;
+  int jid;
+  job_t* job;
+  //did you supply arg
+  if (argv[1] == NULL) {
+    printf("%s requires a jobid or pid.\n",argv[0]);
     return;
+  }
+  //getting the job from jobs to manipulate
+  arg = argv[1];
+  if (arg[0] == '%') {
+    jid = atoi(&arg[1]);
+    job = getjobjid(jobs,jid);
+  }
+  else {
+    job = getjobpid(jobs,atoi(arg));
+  }
+  //okay, now lets actually implement the system.
+  //double check if you job is actually a thing
+  if (job == NULL) {
+    printf("Job does not exist\n");
+  }
+  else if(!strcmp(argv[0],"fg")) {
+    job->state = FG;
+    waitfg(job->pid);
+  }
+  else if (!strcmp(argv[0],"bg")) {
+   printf("[%d] (%d) %s\n",job->jid,job->pid,job->cmdline);
+   job->state= BG;
+  }
+  else {
+    printf("error: BG or FG\n");
+  }
+  return;
 }
 
 /*
@@ -328,7 +361,10 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
-    return;
+  while(pid == fgpid(jobs)) {
+    sleep(1);
+  }
+  return;
 }
 
 /*****************

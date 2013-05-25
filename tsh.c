@@ -212,8 +212,7 @@ void eval(char *cmdline)
     }
     /* child behavior - run job in child context */
     else{
-      printf("child running %i \n", is_bg);
-
+   
       if (!is_bg){
 	sigprocmask(SIG_UNBLOCK, &mask, NULL);
       }

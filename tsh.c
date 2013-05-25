@@ -182,6 +182,7 @@ int main(int argc, char **argv)
  * background children don't receive SIGINT (SIGTSTP) from the kernel
  * when we type ctrl-c (ctrl-z) at the keyboard.
 */
+
 void eval(char *cmdline)
 {
   char** argv;
@@ -387,25 +388,21 @@ void sigchld_handler(int sig)
 {
   int stat; 
   pid_t pid;
-  job_t* child;
+  //job_t* child;
 
   while((pid = waitpid(-1, &stat, WNOHANG|WUNTRACED)) > 0) {
-    if (WIFSIGNALED(stat)) {
-      printf("die, process %d signed: signal %d\n",pid2jid(pid),SIGINT);
-      deletejob(jobs,pid);
+    if (WIFSTOPPED(stat)) {
+      sigtstp_handler(20); 
     }
-    else if (WIFEXITED(stat)) {
-      deletejob(jobs,pid);
+    else if (WIFSIGNALED(stat)) {
+      sigint_handler(-2);
     }
-    else if (WIFSTOPPED(stat)) {
-      child = getjobjid(jobs, pid2jid(pid));
-      child->state = ST;
-      printf("the child %d killed  from signal %d\n",pid2jid(pid),SIGTSTP); 
-    }
-    else {
-      printf("oh fuck, we didn't terminate a child\n");
+    else if (WIFEXITED(stat)){  
+      deletejob(jobs, pid);  
     }
   }
+  
+
   return; //okay, we caught the signals
 }
 
@@ -416,9 +413,17 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig)
 {
-  pid_t p;
-  p = fgpid(jobs); 
-  kill(-p,SIGINT);
+  int p = fgpid(jobs);  
+  int j = pid2jid(p);
+  // send fg job/ related process group signal
+  if (p != 0) {  
+    
+    kill(-p, SIGINT); // send the kill signal
+    if (sig < 0){  
+      deletejob(jobs, p); // delete the job and print out what signal did it
+      printf("Job [%d] (%d) terminated by signal %d\n", j, p, (-sig));  
+    }  
+  }   
   return;
 }
 
@@ -429,11 +434,17 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig)
 {
-  pid_t p;
-  p = fgpid(jobs);
-  kill(-p,SIGTSTP);
+  int p = fgpid(jobs);
+  int j = pid2jid(p);
+  job_t* job = getjobpid(jobs,p);
+  if (p != 0) {
+    printf("Job [%d] (%d) Stopped by signal %d\n", j, p, sig);   
+    job->state = ST;
+    kill(-p, SIGTSTP);
+  }
   return;
 }
+
 
 /*********************
  * End signal handlers

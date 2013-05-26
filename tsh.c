@@ -322,7 +322,11 @@ void do_bgfg(char **argv)
   job_t* job;
   //did you supply arg
   if (argv[1] == NULL) {
-    printf("%s requires a jobid or pid.\n",argv[0]);
+    printf("%s command requires a PID or %%jobid argument\n",argv[0]);
+    return;
+  }
+  if (isalpha(argv[1])) {
+    printf("%s: argument must be a PID or %%jobid\n",argv[0]);
     return;
   }
   //getting the job from jobs to manipulate
@@ -330,14 +334,18 @@ void do_bgfg(char **argv)
   if (arg[0] == '%') {
     jid = atoi(&arg[1]);
     job = getjobjid(jobs,jid);
+    if (job == NULL) { 
+          printf("%s: No such job\n",argv[1]);
+    }
   }
   else {
     job = getjobpid(jobs,atoi(arg));
+    if (job == NULL) { 
+      printf("(%s): No such process\n",argv[1]);
+    }
   }
-  //okay, now lets actually implement the system.
-  //double check if you job is actually a thing
   if (job == NULL) {
-    printf("Job does not exist\n");
+      exit(0);
   }
   else if(!strcmp(argv[0],"fg")) {
     kill(-(job->pid),SIGCONT);

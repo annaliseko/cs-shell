@@ -1,0 +1,12 @@
+#
+# trace14.txt - Simple error handling
+#
+tsh> ./bogus
+./bogus: command not found
+tsh> ./myspin 4 &
+[1] (8219) ./myspin 4 &
+tsh> fg
+fg command requires a PID or %jobid argument
+tsh> bg
+bg command requires a PID or %jobid argument
+tsh> fg a

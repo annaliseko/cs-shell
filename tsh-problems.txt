@@ -27,7 +27,8 @@ trace11:
 trace12:
 	works
 trace13:
-	BROKEN
+	works
 trace14:
+	SEMI-Works
 trace15:
 trace16:

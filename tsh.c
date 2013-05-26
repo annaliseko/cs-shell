@@ -325,10 +325,15 @@ void do_bgfg(char **argv)
     printf("%s command requires a PID or %%jobid argument\n",argv[0]);
     return;
   }
-  if (isalpha(argv[1])) {
-    printf("%s: argument must be a PID or %%jobid\n",argv[0]);
-    return;
+  int len = strlen(argv[1]);
+  int i;
+  for (i = 0; i < len; i++) {
+    if (isalpha(argv[1][i])) {
+      printf("%s: argument must be a PID or %%jobid\n",argv[0]);
+      return;
+    }
   }
+ 
   //getting the job from jobs to manipulate
   arg = argv[1];
   if (arg[0] == '%') {
@@ -336,12 +341,14 @@ void do_bgfg(char **argv)
     job = getjobjid(jobs,jid);
     if (job == NULL) { 
           printf("%s: No such job\n",argv[1]);
+	  return;
     }
   }
   else {
     job = getjobpid(jobs,atoi(arg));
     if (job == NULL) { 
       printf("(%s): No such process\n",argv[1]);
+      return;
     }
   }
   if (job == NULL) {
@@ -398,10 +405,21 @@ void sigchld_handler(int sig)
  
   while((pid = waitpid(-1, &stat, WNOHANG|WUNTRACED)) > 0) {
     if (WIFSTOPPED(stat)) {
-      
+      int p = fgpid(jobs);
+      int j = pid2jid(p);
+      job_t* job = getjobpid(jobs,p);
+      if (p != 0) {
+	printf("Job [%d] (%d) stopped by signal %d\n", j, p, WSTOPSIG(stat));   
+	job->state = ST;
+      }
     }
     else if (WIFSIGNALED(stat)) {
-      deletejob(jobs,pid);
+      int p = fgpid(jobs);
+      int j = pid2jid(p);
+      if (p != 0) {
+	printf("Job [%d] (%d) terminated by signal %d\n", j, p, WTERMSIG(stat));
+	deletejob(jobs,pid);
+      }
     }
     else if (WIFEXITED(stat)){  
       deletejob(jobs, pid);  
@@ -418,11 +436,9 @@ void sigchld_handler(int sig)
 void sigint_handler(int sig)
 {
   int p = fgpid(jobs);  
-  int j = pid2jid(p);
   // send fg job/ related process group signal
   if (p != 0) {      
-    kill(-p, SIGINT); // send the kill signal
-    printf("Job [%d] (%d) terminated by signal %d\n", j, p, sig);    
+    kill(-p, SIGINT); // send the kill signal  
   }   
   return;
 }
@@ -435,11 +451,7 @@ void sigint_handler(int sig)
 void sigtstp_handler(int sig)
 {
   int p = fgpid(jobs);
-  int j = pid2jid(p);
-  job_t* job = getjobpid(jobs,p);
   if (p != 0) {
-    printf("Job [%d] (%d) stopped by signal %d\n", j, p, sig);   
-    job->state = ST;
     kill(-p, SIGTSTP);
   }
   return;

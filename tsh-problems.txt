@@ -1,0 +1,21 @@
+test by:
+make test##
+where ## = {01...16}
+
+trace01: properly terminate on EOF
+	works
+trace02: process builtin quit command
+	works
+trace03: run a foreground job
+	 doesn't work - hangs after entering command
+trace04: run a background job
+	 doesn't work - hangs as above
+trace05: process builtin jobs commant
+	 doesn't work - hangs
+trace06: forward SIGINT to foreground job
+	 doesn't work - hangs
+trace07: forward SIGINT only to foreground job
+	 doesn't work - hangs
+trace08: trace07 with SIGSTP
+	 doesn't work - hangs
+etc...

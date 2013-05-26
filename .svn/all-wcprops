@@ -3,17 +3,11 @@ svn:wc:ra_dav:version-url
 V 42
 /svn/howens-cs154-2013/!svn/ver/89/p4shell
 END
-tsh.c
-K 25
-svn:wc:ra_dav:version-url
-V 48
-/svn/howens-cs154-2013/!svn/ver/96/p4shell/tsh.c
-END
-trace12.txt
+trace03.txt
 K 25
 svn:wc:ra_dav:version-url
 V 54
-/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace12.txt
+/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace03.txt
 END
 00-checkme.html
 K 25
@@ -21,17 +15,17 @@ svn:wc:ra_dav:version-url
 V 58
 /svn/howens-cs154-2013/!svn/ver/87/p4shell/00-checkme.html
 END
-trace03.txt
+trace12.txt
 K 25
 svn:wc:ra_dav:version-url
 V 54
-/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace03.txt
+/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace12.txt
 END
-trace13.txt
+tsh.c
 K 25
 svn:wc:ra_dav:version-url
-V 54
-/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace13.txt
+V 49
+/svn/howens-cs154-2013/!svn/ver/102/p4shell/tsh.c
 END
 trace04.txt
 K 25
@@ -39,17 +33,11 @@ svn:wc:ra_dav:version-url
 V 54
 /svn/howens-cs154-2013/!svn/ver/87/p4shell/trace04.txt
 END
-trace14.txt
+trace13.txt
 K 25
 svn:wc:ra_dav:version-url
 V 54
-/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace14.txt
-END
-myint.c
-K 25
-svn:wc:ra_dav:version-url
-V 50
-/svn/howens-cs154-2013/!svn/ver/87/p4shell/myint.c
+/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace13.txt
 END
 trace05.txt
 K 25
@@ -57,17 +45,17 @@ svn:wc:ra_dav:version-url
 V 54
 /svn/howens-cs154-2013/!svn/ver/87/p4shell/trace05.txt
 END
-trace15.txt
+myint.c
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/howens-cs154-2013/!svn/ver/87/p4shell/myint.c
+END
+trace14.txt
 K 25
 svn:wc:ra_dav:version-url
 V 54
-/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace15.txt
-END
-mysplit.c
-K 25
-svn:wc:ra_dav:version-url
-V 52
-/svn/howens-cs154-2013/!svn/ver/87/p4shell/mysplit.c
+/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace14.txt
 END
 trace06.txt
 K 25
@@ -75,17 +63,29 @@ svn:wc:ra_dav:version-url
 V 54
 /svn/howens-cs154-2013/!svn/ver/87/p4shell/trace06.txt
 END
-trace16.txt
+mysplit.c
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/howens-cs154-2013/!svn/ver/87/p4shell/mysplit.c
+END
+trace15.txt
 K 25
 svn:wc:ra_dav:version-url
 V 54
-/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace16.txt
+/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace15.txt
 END
 trace07.txt
 K 25
 svn:wc:ra_dav:version-url
 V 54
 /svn/howens-cs154-2013/!svn/ver/87/p4shell/trace07.txt
+END
+trace16.txt
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/howens-cs154-2013/!svn/ver/87/p4shell/trace16.txt
 END
 trace08.txt
 K 25

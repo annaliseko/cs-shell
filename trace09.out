@@ -2,14 +2,14 @@
 # trace09.txt - Process bg builtin command
 #
 tsh> ./myspin 4 &
-[1] (5169) ./myspin 4 &
+[1] (12554) ./myspin 4 &
 tsh> ./myspin 5
-Job [2] (5171) stopped by signal 20
+Job [2] (12556) stopped by signal 20
 tsh> jobs
-[1] (5169) Running ./myspin 4 &
-[2] (5171) Stopped ./myspin 5 
+[1] (12554) Running ./myspin 4 &
+[2] (12556) Stopped ./myspin 5 
 tsh> bg %2
-[2] (5171) ./myspin 5 
+[2] (12556) ./myspin 5 
 tsh> jobs
-[1] (5169) Running ./myspin 4 &
-[2] (5171) Running ./myspin 5 
+[1] (12554) Running ./myspin 4 &
+[2] (12556) Running ./myspin 5 

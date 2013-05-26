@@ -19,10 +19,15 @@ trace07: forward SIGINT only to foreground job
 trace08: trace07 with SIGSTP
 	 works
 trace09:
+	works
 trace10:
+	works
 trace11:
+	works
 trace12:
+	works
 trace13:
+	BROKEN
 trace14:
 trace15:
 trace16:

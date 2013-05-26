@@ -340,12 +340,14 @@ void do_bgfg(char **argv)
     printf("Job does not exist\n");
   }
   else if(!strcmp(argv[0],"fg")) {
+    kill(-(job->pid),SIGCONT);
     job->state = FG;
     waitfg(job->pid);
   }
   else if (!strcmp(argv[0],"bg")) {
-   printf("[%d] (%d) %s",job->jid,job->pid,job->cmdline);
-   job->state= BG;
+    kill(-(job->pid),SIGCONT);
+    job->state= BG;
+    printf("[%d] (%d) %s",job->jid,job->pid,job->cmdline);
   }
   else {
     printf("error: BG or FG\n");
